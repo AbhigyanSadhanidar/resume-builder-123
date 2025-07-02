@@ -21,9 +21,6 @@
           "deploymentBucketName": "amplify-resumebuilder-dev-b0d95-deployment",
           "s3Key": "amplify-builds/generatePdfResume-412b67384c2b66444a2f-build.zip"
         }
-      },
-      "api": {
-        "resumebuilder": {}
       }
     }
   }

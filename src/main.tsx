@@ -4,12 +4,10 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./index.css";
 
-import awsExports from "./aws-exports";
 import { Amplify } from "aws-amplify";
+import awsExports from "./aws-exports"; // ✅ This should match your file location
 
 Amplify.configure(awsExports);
-
-
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

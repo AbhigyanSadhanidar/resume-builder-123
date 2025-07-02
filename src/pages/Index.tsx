@@ -3,14 +3,17 @@ import { Link } from "react-router-dom";
 import { getCurrentUser, signOut, signInWithRedirect } from "aws-amplify/auth";
 import { Button } from "@/components/ui/button";
 import { LogOut, LogIn } from "lucide-react";
+import { AuthUser } from "aws-amplify/auth";
 
 const Index = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getCurrentUser()
-      .then((userData) => setUser(userData))
-      .catch(() => setUser(null));
+      .then(setUser)
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleSignOut = async () => {
@@ -29,6 +32,14 @@ const Index = () => {
       console.error("Error signing in:", error);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-600">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -54,10 +65,13 @@ const Index = () => {
       </div>
 
       <div className="text-center mt-20">
-        <h2 className="text-4xl font-semibold mb-4">Build Stunning Resumes Effortlessly</h2>
+        <h2 className="text-4xl font-semibold mb-4">
+          Build Stunning Resumes Effortlessly
+        </h2>
         <p className="text-gray-600 text-lg">
           Start by logging in and selecting a template to create your professional resume in minutes.
         </p>
+
         {user && (
           <Link to="/resume-builder">
             <Button className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600">
