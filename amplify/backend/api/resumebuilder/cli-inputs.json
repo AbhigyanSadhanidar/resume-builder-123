@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "paths": {
+    "/generate-pdf": {
+      "name": "/generate-pdf",
+      "lambdaFunction": "generatePdfResume",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create"
+        ]
+      }
+    }
+  }
+}

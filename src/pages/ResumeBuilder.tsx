@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,9 @@ import SkillsForm from "../components/SkillsForm";
 import SummaryForm from "../components/SummaryForm";
 import ResumePreview from "../components/ResumePreview";
 import TemplateSelector from "../components/TemplateSelector";
+import { fetchAuthSession } from "aws-amplify/auth";
+
+import axios from "axios";
 
 export interface ResumeData {
   personalInfo: {
@@ -86,17 +88,45 @@ const ResumeBuilder = () => {
     console.log("Saving resume data:", resumeData);
   };
 
-  const handleGeneratePDF = () => {
+  const handleGeneratePDF = async () => {
     toast({
       title: "Generating PDF",
       description: "Your resume PDF is being generated...",
     });
-    console.log("Generating PDF for resume:", resumeData);
+  
+    try {
+      // Fetch the Cognito Auth token
+      const session = await fetchAuthSession();
+      const idToken = session.tokens?.idToken?.toString();
+  
+      const response = await axios.post(
+        "https://y88lrovemf.execute-api.ap-south-1.amazonaws.com/dev/generate-pdf",
+        {
+          name: resumeData.personalInfo.fullName,
+          skills: resumeData.skills.technical,
+        },
+        {
+          headers: {
+            Authorization: idToken, // attach token for API Gateway auth
+          },
+        }
+      );
+  
+      const url = response.data.url;
+      window.open(url, "_blank");
+    } catch (error) {
+      toast({
+        title: "Error generating PDF",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+      console.error("PDF Generation Error:", error);
+    }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -125,9 +155,7 @@ const ResumeBuilder = () => {
 
       <div className="container mx-auto px-4 py-6">
         <div className="grid lg:grid-cols-2 gap-6">
-          {/* Left Panel - Form */}
           <div className="space-y-6">
-            {/* Template Selector */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -143,7 +171,6 @@ const ResumeBuilder = () => {
               </CardContent>
             </Card>
 
-            {/* Resume Form Sections */}
             <Card>
               <CardContent className="p-0">
                 <Tabs defaultValue="personal" className="w-full">
@@ -198,7 +225,6 @@ const ResumeBuilder = () => {
             </Card>
           </div>
 
-          {/* Right Panel - Preview */}
           <div className="lg:sticky lg:top-24 lg:h-fit">
             <Card>
               <CardHeader>
